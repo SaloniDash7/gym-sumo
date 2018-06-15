@@ -1,2 +1,2 @@
 # gym-intersection
-OpenAI gym wrapper for SUMO 
+OpenAI Gym Environment for Intersection Traffic using SUMO 
