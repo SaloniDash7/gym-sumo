@@ -1,1 +1,0 @@
-from gym_intersection.envs.intersection_env import IntersectionEnv
