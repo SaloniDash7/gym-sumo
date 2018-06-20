@@ -1,2 +1,2 @@
-# gym-intersection
+# gym-sumo
 OpenAI Gym Environment for SUMO 
