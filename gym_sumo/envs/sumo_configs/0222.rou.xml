@@ -1,0 +1,30 @@
+<!-- Right turn - describe the different routes and vehicles on these routes -->
+				<routes>
+
+				    <!-- Route distribution -->
+				    <routeDistribution id="routeDist0">
+				        <route id="route0" edges="4to5 5to2" probability="1.0"/>
+				    </routeDistribution>
+				    <routeDistribution id="routeDist1">
+				        <route id="route1" edges="2to5 5to4" probability="1.0"/>
+				    </routeDistribution>
+
+				    <!-- Vehicle type distribution -->
+				    <vTypeDistribution id="typeDist0">
+				        <vType id="vType1" vClass="passenger" guiShape="passenger/sedan" color="1,1,0" speedDev="0.1" probability="1.0"/>
+				   </vTypeDistribution>
+
+				    <!-- Traffic Flow -->
+				    <flow id="flow0" begin="0" type="typeDist0" route="routeDist0" departSpeed="random" departLane="0" probability="0.3333"/> 
+<flow id="flow1" begin="0" type="typeDist0" route="routeDist1" departSpeed="random" departLane="0" probability="0.3333"/> 
+<flow id="flow2" begin="0" type="typeDist0" route="routeDist0" departSpeed="random" departLane="1" probability="0.3333"/> 
+<flow id="flow3" begin="0" type="typeDist0" route="routeDist1" departSpeed="random" departLane="1" probability="0.3333"/> 
+<flow id="flow4" begin="0" type="typeDist0" route="routeDist0" departSpeed="random" departLane="2" probability="0.3333"/> 
+<flow id="flow5" begin="0" type="typeDist0" route="routeDist1" departSpeed="random" departLane="2" probability="0.3333"/> 
+
+				    <!-- Ego car -->
+				    <route id="routeEgo" edges="1to5 5to4"/>
+				    <vType id="vType0" vClass="passenger" guiShape="passenger/sedan" color="1,0,0"/>
+
+				</routes>
+				

@@ -1,0 +1,197 @@
+from subprocess import call
+import numpy as np
+import os
+# os.system("some_command < input_file | another_command > output_file") 
+
+
+# 0. Left, Center, Right
+# 1. # Lanes
+# 2. Density of Traffic
+# 3. Angles
+num_features = 4 
+max_num = 3
+
+def createFile(text,filename):
+	f = open(filename, 'w')
+	f.write(text)
+	f.close()
+
+for d0 in range(max_num):
+	for d1 in range(max_num):
+		for d2 in range(max_num):
+			for d3 in range(max_num):
+
+				descriptor = np.asarray([d0,d1,d2,d3])
+				descriptor = descriptor.astype(int)
+
+				### Create Node file ###
+
+				if descriptor[3]==0:
+					y1 = 10
+					y2 = -y1
+				elif descriptor[3]==1:
+					y1 = 0
+					y2 = 0
+				elif descriptor[3]==2:
+					y1 = -10
+					y2 = -y1
+
+				node_filename = str(descriptor[3])+'.nod.xml'
+				node_text = '''<!-- Describe the nodes of the road network -->
+				<nodes>
+					<node id="1" x="+0.0" y="-100.0" /> 
+					<node id="2" x="+100.0" y="'''+str(y1)+'''" />
+					<node id="3" x="+0.0" y="+100.0" />
+					<node id="4" x="-100.0" y="'''+str(y2)+'''" />
+					<node id="5" x="+0.0" y="0.0" />
+				</nodes>
+				'''
+
+				createFile(node_text, node_filename)	
+
+
+
+
+				### Create Edge File ###
+				if descriptor[1]==0:
+					num_lanes = 1
+				elif descriptor[1]==1:
+					num_lanes = 2
+				elif descriptor[1]==2:
+					num_lanes = 3
+
+				edge_filename = str(descriptor[1])+'.edg.xml'
+				edge_text='''<!-- Describe the connected edges of the road network -->
+				<edges>
+				    <edge id="1to5" from="1" to="5" priority="2" numLanes="1" speed="20.1168" width='4.0'/>
+				    <edge id="5to1" from="5" to="1" priority="2" numLanes="1" speed="20.1168" width='4.0'/>    
+				    
+				    <edge id="2to5" from="2" to="5" priority="3" numLanes="'''+str(num_lanes)+'''" speed="20.1168" width='4.0'/>
+				    <edge id="5to2" from="5" to="2" priority="3" numLanes="'''+str(num_lanes)+'''" speed="20.1168" width='4.0'/>
+				    
+				    <edge id="3to5" from="3" to="5" priority="2" numLanes="1" speed="20.1168" width='4.0'/>
+				    <edge id="5to3" from="5" to="3" priority="2" numLanes="1" speed="20.1168" width='4.0'/>
+
+				    <edge id="4to5" from="4" to="5" priority="3" numLanes="'''+str(num_lanes)+'''" speed="20.1168" width='4.0'/>
+				    <edge id="5to4" from="5" to="4" priority="3" numLanes="'''+str(num_lanes)+'''" speed="20.1168" width='4.0'/> 
+				</edges>'''
+				createFile(edge_text, edge_filename)	
+
+
+
+				### Generate netccfg ###
+				netccfg_filename = str(descriptor[3])+str(descriptor[1])+'.netccfg'
+				netxml_filename = str(descriptor[3])+str(descriptor[1])+'.net.xml'
+				netccfg_text = '''<?xml version="1.0" encoding="UTF-8"?>
+				<!-- The network configuration file used when compiling the .net xml file -->
+				<configuration>
+				    <input>
+				        <node-files value="'''+node_filename+'''"/>
+				        <edge-files value="'''+edge_filename+'''"/>
+				        <!-- <connection-files value="intersection.con.xml"/> -->
+				        <!-- <type-files value="intersection.typ.xml"/> -->
+				    </input>
+
+				    <output>
+				        <output-file value="'''+netxml_filename+'''"/>
+				    </output>
+
+				    <processing>
+				        <no-turnarounds value="true"/>
+				    </processing>
+
+				    <report>
+				        <verbose value="true"/>
+				    </report>
+
+				</configuration>
+				'''
+				createFile(netccfg_text, netccfg_filename)
+
+
+
+				### Generate net.xml ###
+				os.system("netconvert -c "+netccfg_filename) 
+
+
+
+				### Generate Route ###
+				if descriptor[0]==0:
+					route_type = '''<route id="routeEgo" edges="1to5 5to4"/>'''
+				elif descriptor[0]==1:
+					route_type = '''<route id="routeEgo" edges="1to5 5to3"/>'''
+				elif descriptor[0]==2:
+					route_type = '''<route id="routeEgo" edges="1to5 5to2"/>'''
+
+				if descriptor[2]==0:
+					density = 0.05
+				elif descriptor[2]==1:
+					density = 0.1
+				elif descriptor[2]==2:
+					density = 0.2
+
+				counter = 0
+				flows = ''
+				for j in range(descriptor[1]+1): # lanes
+					for i in range(2): # traffic left or right
+						flow = '''<flow id="flow'''+str(counter)+'''" begin="0" type="typeDist0" route="routeDist'''+str(i)+'''" departSpeed="random" departLane="'''+str(j)+'''" probability="'''+str(density)+'''"/> \n'''
+						flows+=flow
+						counter+=1
+
+				route_filename = str(descriptor[0])+str(descriptor[1])+str(descriptor[2])+str(descriptor[3])+'.rou.xml'
+				route_text = '''<!-- Right turn - describe the different routes and vehicles on these routes -->
+				<routes>
+
+				    <!-- Route distribution -->
+				    <routeDistribution id="routeDist0">
+				        <route id="route0" edges="4to5 5to2" probability="1.0"/>
+				    </routeDistribution>
+				    <routeDistribution id="routeDist1">
+				        <route id="route1" edges="2to5 5to4" probability="1.0"/>
+				    </routeDistribution>
+
+				    <!-- Vehicle type distribution -->
+				    <vTypeDistribution id="typeDist0">
+				        <vType id="vType1" vClass="passenger" guiShape="passenger/sedan" color="1,1,0" speedDev="0.1" probability="1.0"/>
+				   </vTypeDistribution>
+
+				    <!-- Traffic Flow -->
+				    '''+flows+'''
+				    <!-- Ego car -->
+				    '''+route_type+'''
+				    <vType id="vType0" vClass="passenger" guiShape="passenger/sedan" color="1,0,0"/>
+
+				</routes>
+				'''
+				createFile(route_text, route_filename) 
+
+
+
+				### Generate sumocfg ###
+				sumocfg_filename = str(descriptor[0])+str(descriptor[1])+str(descriptor[2])+str(descriptor[3])+'.sumocfg'
+				sumocfg_text = '''<?xml version="1.0" encoding="UTF-8"?>
+				<!-- The sumo configuration file used when running the experiment -->
+				<configuration>
+
+				    <input>
+				        <net-file value="'''+netxml_filename+'''"/>
+				        <route-files value="'''+route_filename+'''"/>
+				        <gui-settings-file value="intersection.settings.xml"/>
+				    </input>
+
+				    <time>
+				        <!-- The beginning and end times are overwritten if running from python using traci -->
+						<step-length value="0.05"/>
+				    </time>
+
+				    <random-number>
+				        <random value="true"/>
+				    </random-number>
+
+				    <!-- <processing>
+				    	<random-depart-offset value="5"/>
+				    </processing> -->
+
+				</configuration>
+				'''
+				createFile(sumocfg_text, sumocfg_filename)

@@ -1,0 +1,9 @@
+<!-- Describe the nodes of the road network -->
+				<nodes>
+					<node id="1" x="+0.0" y="-100.0" /> 
+					<node id="2" x="+100.0" y="10" />
+					<node id="3" x="+0.0" y="+100.0" />
+					<node id="4" x="-100.0" y="-10" />
+					<node id="5" x="+0.0" y="0.0" />
+				</nodes>
+				

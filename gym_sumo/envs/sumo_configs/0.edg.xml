@@ -1,0 +1,14 @@
+<!-- Describe the connected edges of the road network -->
+				<edges>
+				    <edge id="1to5" from="1" to="5" priority="2" numLanes="1" speed="20.1168" width='4.0'/>
+				    <edge id="5to1" from="5" to="1" priority="2" numLanes="1" speed="20.1168" width='4.0'/>    
+				    
+				    <edge id="2to5" from="2" to="5" priority="3" numLanes="1" speed="20.1168" width='4.0'/>
+				    <edge id="5to2" from="5" to="2" priority="3" numLanes="1" speed="20.1168" width='4.0'/>
+				    
+				    <edge id="3to5" from="3" to="5" priority="2" numLanes="1" speed="20.1168" width='4.0'/>
+				    <edge id="5to3" from="5" to="3" priority="2" numLanes="1" speed="20.1168" width='4.0'/>
+
+				    <edge id="4to5" from="4" to="5" priority="3" numLanes="1" speed="20.1168" width='4.0'/>
+				    <edge id="5to4" from="5" to="4" priority="3" numLanes="1" speed="20.1168" width='4.0'/> 
+				</edges>

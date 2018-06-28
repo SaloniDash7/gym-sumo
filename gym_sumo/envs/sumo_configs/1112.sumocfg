@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+				<!-- The sumo configuration file used when running the experiment -->
+				<configuration>
+
+				    <input>
+				        <net-file value="21.net.xml"/>
+				        <route-files value="1112.rou.xml"/>
+				        <gui-settings-file value="intersection.settings.xml"/>
+				    </input>
+
+				    <time>
+				        <!-- The beginning and end times are overwritten if running from python using traci -->
+						<step-length value="0.2"/>
+				    </time>
+
+				    <random-number>
+				        <random value="true"/>
+				    </random-number>
+
+				    <!-- <processing>
+				    	<random-depart-offset value="5"/>
+				    </processing> -->
+
+				</configuration>
+				
