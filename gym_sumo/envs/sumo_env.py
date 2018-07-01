@@ -9,25 +9,13 @@ from string import Template
 import numpy as np
 import math
 import time
-from cv2 import imread,imshow
+from cv2 import imread,imshow,resize
+import cv2
 
 import os, sys, subprocess
 
 STATE_W = 128
 STATE_H = 128
-
-
-class Car:
-	""" A class struct that stores the car features.
-	"""
-	def __init__(self, carID, position = None, distance = None, speed = None, angle = None, signal = None, length = None):
-		self.carID = carID
-		self.position = position
-		self.distance = distance
-		self.speed = speed
-		self.angle = angle
-		self.signal = signal
-		self.length = length
 
 
 if 'SUMO_HOME' in os.environ:
@@ -45,6 +33,9 @@ class SUMOEnv(Env):
 		self._seed()
 		self.traci = self.initSimulator(True,8870)
 		self.sumo_step = 0
+		self.collisions =0
+		self.episode = 0
+		self.flag = True
 
 		self.action_space = spaces.Box(low=np.array([-1]), high= np.array([+1])) # acceleration
 		self.observation_space = spaces.Box(low=0, high=255, shape=(STATE_H, STATE_W, 1), dtype=np.uint8)
@@ -54,6 +45,7 @@ class SUMOEnv(Env):
 
 		## INITIALIZE EGO CAR
 		self.egoCarID = 'veh0'
+		self.speed = 0
 		self.max_speed = 20.1168		# m/s 
 		self.observation = self._reset()
 
@@ -63,6 +55,7 @@ class SUMOEnv(Env):
 
 	def _step(self,accel):
 		r = 0
+		self.sumo_step +=1
 		self.takeAction(accel)
 		self.traci.simulationStep()
 
@@ -77,7 +70,12 @@ class SUMOEnv(Env):
 
 		info = {braking, terminalType}
 
-		return self.observation, reward, terminal, info
+		if(self.episode%5==0  and self.flag):
+			self.flag = False
+			print("Collision Rate : {0} ".format(self.collisions/5))
+			self.collisions = 0
+
+		return self.observation, reward, terminal, {}
 
 	def _reward(self):
 		terminal = False
@@ -93,23 +91,44 @@ class SUMOEnv(Env):
 			distance_ego = 0
 
 		# Step cost
-		reward = -.01 
+		reward = -0.1 
+
+		#Cooperation Reward
+		traffic_waiting = self.isTrafficWaiting()
+		traffic_braking = self.isTrafficBraking()
+
+		if(traffic_waiting and traffic_braking):
+			reward += -0.05
+		elif(traffic_braking or traffic_waiting):
+			reward += -0.025
+		elif(not traffic_waiting and not traffic_braking):
+			reward += + 0.05
 
 		# Collision check
 		teleportIDList = self.traci.simulation.getStartingTeleportIDList()
 		if teleportIDList:
 			collision = True
-			reward = -1.0 
+			self.collisions +=1
+			reward += -1.0 
 			terminal = True
 			terminalType = 'Collided!!!'
+			self.episode += 1
+			if(self.episode%5 == 0):
+				self.flag = True
+
+			#print("Reward for this episode is :{0}".format(reward))
 
 		else: # Goal check
 			position_ego = np.asarray(self.traci.vehicle.getPosition(self.egoCarID))
+			#print(position_ego)
 			distance_ego = np.linalg.norm(position_ego - self.endPos)
 			if position_ego[0] <= self.endPos[0]:
-				reward = 1.0 
+				reward += 1.0 
 				terminal = True
 				terminalType = 'Survived'
+				self.episode +=1
+				if(self.episode%5 == 0):
+					self.flag = True
 		
 
 		return reward, terminal, terminalType
@@ -117,10 +136,12 @@ class SUMOEnv(Env):
 
 	def _observation(self):
 		if self.mode == "gui":
-			self.traci.gui.screenshot(self.traci.gui.DEFAULT_VIEW,os.path.join(os.path.dirname(os.path.realpath(__file__)),'screenshot.png'))
+			self.traci.gui.screenshot(self.traci.gui.DEFAULT_VIEW,os.path.join(os.path.dirname(os.path.realpath(__file__)),'sumo.png'))
 
-		image = imread(os.path.join(os.path.dirname(os.path.realpath(__file__)),'screenshot.png'),0)
-		imshow('Display window',image)
+		image = imread(os.path.join(os.path.dirname(os.path.realpath(__file__)),'sumo.png'),0)
+		image = resize(image,(STATE_W,STATE_H))
+		image = image.reshape((STATE_W,STATE_H,1))
+		#imshow('Display window',image)
 
 
 		return image
@@ -133,6 +154,7 @@ class SUMOEnv(Env):
 
 		self.addEgoCar()            # Add the ego car to the scene
 		self.setGoalPosition()      # Set the goal position
+		self.speed = 0
 		self.traci.simulationStep() 		# Take a simulation step to initialize car
 		
 		self.observation = self._observation()
@@ -142,7 +164,7 @@ class SUMOEnv(Env):
 	def _render(self, mode='gui', close=False):
 
 		if self.mode == "gui":
-			img = imread(os.path.join(os.path.dirname(os.path.realpath(__file__)),'screenshot.png'), mode="RGB")
+			img = imread(os.path.join(os.path.dirname(os.path.realpath(__file__)),'sumo.png'), 1)
 			if mode == 'rgb_array':
 				return img
 			elif mode == 'human':
@@ -177,7 +199,7 @@ class SUMOEnv(Env):
 		sys.stdout.flush()
 	
 	def setGoalPosition(self):
-		self.endPos= [101.5, 113.0]
+		self.endPos= [79.0, 113.65]
 
 		
 	def addEgoCar(self):																
@@ -203,7 +225,7 @@ class SUMOEnv(Env):
 		# pos    = -2   (random position)
 		# speed  = -2   (random speed)
 		
-		self.traci.vehicle.add(self.egoCarID, 'routeEgo', depart=-1, pos=92.0, speed=0, lane=0, typeID='vType0')
+		self.traci.vehicle.addFull(self.egoCarID, 'routeEgo', depart=None, departPos='84.0', departSpeed='0', departLane='0', typeID='vType0')
 	
 
 		self.traci.vehicle.setSpeedMode(self.egoCarID, int('00000',2))
@@ -219,15 +241,30 @@ class SUMOEnv(Env):
 					return True
 		return False
 
+	def isTrafficWaiting(self):
+		""" Check if any car is waiting
+		"""
+		for carID in self.traci.vehicle.getIDList():
+			if carID != self.egoCarID:
+				speed = self.traci.vehicle.getSpeed(carID)
+				if speed <= 1e-1:
+					return True
+		return False
+
 	def takeAction(self, accel):
 		# New speed
-		self.speed = self.speed + (self.traci.simulation.getDeltaT()/1000.0)*accel
-		
+		dt = self.traci.simulation.getDeltaT()/1000.0
+		self.speed = self.speed + (dt)*accel
+		#print(self.traci.simulation.getDeltaT()/1000.0)
 		if self.speed > self.max_speed:
 			# Exceeded lane speed limit
-			self.speed = self.max_speed
+			self.speed = self.max_speed 
+		elif self.speed < 0 :
+			self.speed = 0
 
-		self.traci.vehicle.setAccel(self.egoCarID, accel)
+		#print("\n Speed is : {0}".format(self.speed))
+		self.traci.vehicle.slowDown(self.egoCarID, self.speed,int(dt*1000))
+
 
 
 	

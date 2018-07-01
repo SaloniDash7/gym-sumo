@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on Tue Dec  5 11:41:43 2017 by SUMO netconvert Version dev-SVN-r25996
+<!-- generated on Friday 29 June 2018 12:31:15 PM CEST by Netedit Version 0.32.0
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <node-files value="1.nod.xml"/>
-        <edge-files value="2.edg.xml"/>
+        <sumo-net-file value="/home/salonidash7/gym-sumo/gym_sumo/envs/sumo_configs/12.net.xml"/>
     </input>
 
     <output>
-        <output-file value="12.net.xml"/>
+        <output-file value="/home/salonidash7/gym-sumo/gym_sumo/envs/sumo_configs/12.net.xml"/>
     </output>
 
     <processing>
         <no-turnarounds value="true"/>
+        <offset.disable-normalization value="true"/>
+        <lefthand value="false"/>
+        <junctions.corner-detail value="0"/>
+        <rectangular-lane-cut value="false"/>
+        <walkingareas value="false"/>
     </processing>
-
-    <report>
-        <verbose value="true"/>
-    </report>
 
 </configuration>
 -->
@@ -152,23 +152,23 @@
     <connection from="4to5" to="5to2" fromLane="2" toLane="2" via=":5_12_2" dir="s" state="M"/>
     <connection from="4to5" to="5to3" fromLane="2" toLane="0" via=":5_15_0" dir="l" state="m"/>
 
-    <connection from=":5_0" to="5to4" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":5_0" to="5to4" fromLane="0" toLane="0" dir="r" state="M"/>
     <connection from=":5_1" to="5to1" fromLane="0" toLane="0" dir="s" state="M"/>
-    <connection from=":5_2" to="5to2" fromLane="0" toLane="2" dir="s" state="M"/>
-    <connection from=":5_3" to="5to3" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":5_2" to="5to2" fromLane="0" toLane="2" dir="l" state="M"/>
+    <connection from=":5_3" to="5to3" fromLane="0" toLane="0" dir="r" state="M"/>
     <connection from=":5_4" to="5to4" fromLane="0" toLane="0" dir="s" state="M"/>
     <connection from=":5_4" to="5to4" fromLane="1" toLane="1" dir="s" state="M"/>
     <connection from=":5_4" to="5to4" fromLane="2" toLane="2" dir="s" state="M"/>
-    <connection from=":5_7" to="5to1" fromLane="0" toLane="0" via=":5_16_0" dir="s" state="m"/>
-    <connection from=":5_16" to="5to1" fromLane="0" toLane="0" dir="s" state="M"/>
-    <connection from=":5_8" to="5to2" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":5_7" to="5to1" fromLane="0" toLane="0" via=":5_16_0" dir="l" state="m"/>
+    <connection from=":5_16" to="5to1" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":5_8" to="5to2" fromLane="0" toLane="0" dir="r" state="M"/>
     <connection from=":5_9" to="5to3" fromLane="0" toLane="0" dir="s" state="M"/>
-    <connection from=":5_10" to="5to4" fromLane="0" toLane="2" dir="s" state="M"/>
-    <connection from=":5_11" to="5to1" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":5_10" to="5to4" fromLane="0" toLane="2" dir="l" state="M"/>
+    <connection from=":5_11" to="5to1" fromLane="0" toLane="0" dir="r" state="M"/>
     <connection from=":5_12" to="5to2" fromLane="0" toLane="0" dir="s" state="M"/>
     <connection from=":5_12" to="5to2" fromLane="1" toLane="1" dir="s" state="M"/>
     <connection from=":5_12" to="5to2" fromLane="2" toLane="2" dir="s" state="M"/>
-    <connection from=":5_15" to="5to3" fromLane="0" toLane="0" via=":5_17_0" dir="s" state="m"/>
-    <connection from=":5_17" to="5to3" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":5_15" to="5to3" fromLane="0" toLane="0" via=":5_17_0" dir="l" state="m"/>
+    <connection from=":5_17" to="5to3" fromLane="0" toLane="0" dir="l" state="M"/>
 
 </net>
