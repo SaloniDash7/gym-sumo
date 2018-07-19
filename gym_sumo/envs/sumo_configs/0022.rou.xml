@@ -19,7 +19,7 @@
 <flow id="flow1" begin="0" type="typeDist0" route="routeDist1" departSpeed="random" departLane="0" probability="0.3333"/> 
 
 				    <!-- Ego car -->
-				    <route id="routeEgo" edges="1to5 5to4"/>
+				    <route id="routeEgo" edges="1to5 5to2"/>
 				    <vType id="vType0" vClass="passenger" guiShape="passenger/sedan" color="1,0,0"/>
 
 				</routes>
