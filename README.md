@@ -2,7 +2,7 @@
 OpenAI Gym Environment for SUMO 
 
 Video of converged behavior:
-[![Two Lane Left Goal Scenario](https://drive.google.com/drive/folders/1-7Of9kmLWcUbtVwYXX9TJebboQrjEfRK)](https://drive.google.com/file/d/13692gmf9HiPsAXXY5HuyMo18V7vULHWt/view?usp=sharing)
+[Two Lane Left Goal Scenario](https://drive.google.com/file/d/13692gmf9HiPsAXXY5HuyMo18V7vULHWt/view?usp=sharing)
 
 Analysis:
 * Learned behaviour:
